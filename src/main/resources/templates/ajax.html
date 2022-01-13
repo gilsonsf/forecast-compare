@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>IPT_Masters</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" type="text/css"
+          href="webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
+
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+    <!-- Optional Bootstrap theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous"/>
+
+    <!-- Include SmartWizard CSS -->
+    <link href="/css/smart_wizard.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Optional SmartWizard theme -->
+    <link href="/css/smart_wizard_theme_circles.min.css" rel="stylesheet" type="text/css" />
+    <link href="/css/smart_wizard_theme_arrows.min.css" rel="stylesheet" type="text/css" />
+    <link href="/css/smart_wizard_theme_dots.min.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">IPT_Masters</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container" style="min-height: 500px">
+
+    <div class="starter-template">
+
+        <div id="smartwizard">
+            <ul>
+                <li><a href="#step-1"><strong>Passo 1</strong><br /><small>Importar Massa de Dados</small></a></li>
+                <li><a href="#step-2"><strong>Passo 2</strong><br /><small>Importar Previsões do Power BI</small></a></li>
+                <li><a href="#step-3"><strong>Passo 3</strong><br /><small>Executar Previsões do GM</small></a></li>
+                <li><a href="#step-4"><strong>Passo 4</strong><br /><small>Resultado</small></a></li>
+            </ul>
+
+            <div>
+                <div id="step-1" class="">
+                    <form method="POST" enctype="multipart/form-data" id="fileUploadForm">
+                        <div class="form-group">
+                            <input type="file" name="file" class="form-control-file"/>
+                        </div>
+                        <input type="submit" value="Upload File" id="btnSubmit" class="btn btn-primary"/>
+                    </form>
+                    <br/>
+                    <pre>
+                        <span id="result"></span>
+                    </pre>
+                </div>
+
+                <div id="step-2" class="">
+                    <h2>Importar Previsões do Power BI</h2>
+                    <div>Importar Previsões do Power BI</div>
+                    <form method="POST" enctype="multipart/form-data" id="fileUploadFormBI">
+                        <div class="form-group">
+                            <input type="file" name="fileBI" class="form-control-file"/>
+                        </div>
+                        <input type="submit" value="Upload File" id="btnSubmitBI" class="btn btn-primary"/>
+                    </form>
+                    <br/>
+                    <pre>
+                        <span id="resultBI"></span>
+                    </pre>
+                </div>
+
+                <div id="step-3" class="">
+                    <h2>Executar Previsões do GM</h2>
+                    <div>Executar Previsões do GM</div>
+                </div>
+                <div id="step-4" class="">
+                    <h2>Resultado</h2>
+                    <div>Resultado</div>
+
+                    <form class="form-horizontal" id="chart-form">
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" id="btn-chart"
+                                        class="btn btn-primary btn-lg">Chart
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+
+                    <div id="linechart_material" style="width: 900px; height: 500px"></div>
+                    <br/>
+                    <div id="linechart_material_pe" style="width: 900px; height: 500px"></div>
+                    <br/>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+
+<div class="container">
+    <footer>
+        <p>
+            © <a href="https://github.com/gilsonsf">GSF</a> 2021
+        </p>
+    </footer>
+</div>
+
+<script type="text/javascript"
+        src="webjars/jquery/2.2.4/jquery.min.js"></script>
+
+<script type="text/javascript" src="js/main.js"></script>
+
+<!-- Include jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+
+<!-- Include SmartWizard JavaScript source -->
+
+<script src="/js/jquery.smartWizard.min.js"></script>
+
+<script type="text/javascript" src="js/main.js"></script>
+
+<script type="text/javascript">
+        $(document).ready(function(){
+            // Smart Wizard
+            $('#smartwizard').smartWizard({
+                    selected: 0,
+                    theme: 'default',
+                    transitionEffect:'slide',
+                    toolbarSettings: {toolbarPosition: 'both',
+                                      toolbarExtraButtons: [
+                                            {label: 'Finish', css: 'btn-success', onClick: function(){ alert('Finish Clicked'); }},
+                                            {label: 'Cancel', css: 'btn-warning', onClick: function(){ $('#smartwizard').smartWizard("reset"); }}
+                                        ]
+                                    }
+                 });
+
+
+            // External Button Events
+            $("#reset-btn").on("click", function() {
+                // Reset wizard
+                $('#smartwizard').smartWizard("reset");
+                return true;
+            });
+
+            $("#prev-btn").on("click", function() {
+                // Navigate previous
+                $('#smartwizard').smartWizard("prev");
+                return true;
+            });
+
+            $("#next-btn").on("click", function() {
+                // Navigate next
+                $('#smartwizard').smartWizard("next");
+                return true;
+            });
+
+                $('#smartwizard').smartWizard("theme", "arrows");
+
+        });
+    </script>
+
+</body>
+</html>

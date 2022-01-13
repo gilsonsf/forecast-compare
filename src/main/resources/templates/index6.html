@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Smart Wizard - a JavaScript jQuery Step Wizard plugin</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <!-- Optional Bootstrap theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+    <!-- Include SmartWizard CSS -->
+    <link href="/css/smart_wizard.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Optional SmartWizard theme -->
+    <link href="/css/smart_wizard_theme_circles.min.css" rel="stylesheet" type="text/css" />
+    <link href="/css/smart_wizard_theme_arrows.min.css" rel="stylesheet" type="text/css" />
+    <link href="/css/smart_wizard_theme_dots.min.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div class="container">
+
+<!--    <form class="form-inline">-->
+<!--        <label>External Buttons:</label>-->
+<!--        <div class="btn-group navbar-btn" role="group">-->
+<!--            <button class="btn btn-success" id="prev-btn" type="button">Back</button>-->
+<!--            <button class="btn btn-success" id="next-btn" type="button">Next</button>-->
+<!--            <button class="btn btn-primary" id="reset-btn" type="button">Reset</button>-->
+<!--        </div>-->
+<!--    </form>-->
+    <br />
+    <h1 class="mt-5">IPT_Masters</h1>
+    <br /><br /><br />
+
+    <!-- SmartWizard html -->
+    <div id="smartwizard">
+        <ul>
+            <li><a href="#step-1"><strong>Passo 1</strong><br /><small>Importar Massa de Dados</small></a></li>
+            <li><a href="#step-2"><strong>Passo 2</strong><br /><small>Importar Previsões do Power BI</small></a></li>
+            <li><a href="#step-3"><strong>Passo 3</strong><br /><small>Executar Previsões do GM</small></a></li>
+            <li><a href="#step-4"><strong>Passo 4</strong><br /><small>Resultado</small></a></li>
+        </ul>
+
+        <div>
+            <div id="step-1" class="">
+<!--                <h2>The content for step 1</h2>-->
+<!--                Write content here for step 1.-->
+
+                <div class="col-md-8 mx-auto">
+                    <h2>Escolha um arquivo para massa de dados</h2>
+                    <p th:text="${message}" th:if="${message ne null}" class="alert alert-primary"></p>
+                    <form method="post" th:action="@{/upload}" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <input type="file" name="file" class="form-control-file">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload File</button>
+                    </form>
+                </div>
+
+            </div>
+            <div id="step-2" class="">
+                <h2>Step 2 Content</h2>
+                <div>Information for step 2</div>
+            </div>
+            <div id="step-3" class="">
+                You may use a form as well!
+            </div>
+            <div id="step-4" class="">
+                <h2>Step 4 Content</h2>
+                <div class="panel panel-default">
+                    <div class="panel-heading">My Details</div>
+                    <table class="table">
+                        <tbody>
+                        <tr> <th>Name:</th> <td>Your Name</td> </tr>
+                        <tr> <th>Email:</th> <td>abc@example.com</td> </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <form method="post" th:action="@{/load}">
+                    <button type="submit" class="btn btn-primary">Load</button>
+                    <button type="button" onclick="drawChart()" class="btn btn-primary">Draw Chart</button>
+                </form>
+
+                <div id="linechart_material" style="width: 900px; height: 500px"></div>
+                <br/>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<!-- Include jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<!-- Include SmartWizard JavaScript source -->
+<!--<script type="text/javascript" src="js/smartWizard/jquery.smartWizard.min.js"></script>-->
+<script src="/js/jquery.smartWizard.min.js"></script>
+
+<script type="text/javascript">
+        $(document).ready(function(){
+            // Smart Wizard
+            $('#smartwizard').smartWizard({
+                    selected: 0,
+                    theme: 'default',
+                    transitionEffect:'slide',
+                    toolbarSettings: {toolbarPosition: 'both',
+                                      toolbarExtraButtons: [
+                                            {label: 'Finish', css: 'btn-success', onClick: function(){ alert('Finish Clicked'); }},
+                                            {label: 'Cancel', css: 'btn-warning', onClick: function(){ $('#smartwizard').smartWizard("reset"); }}
+                                        ]
+                                    }
+                 });
+
+
+            // External Button Events
+            $("#reset-btn").on("click", function() {
+                // Reset wizard
+                $('#smartwizard').smartWizard("reset");
+                return true;
+            });
+
+            $("#prev-btn").on("click", function() {
+                // Navigate previous
+                $('#smartwizard').smartWizard("prev");
+                return true;
+            });
+
+            $("#next-btn").on("click", function() {
+                // Navigate next
+                $('#smartwizard').smartWizard("next");
+                return true;
+            });
+
+                $('#smartwizard').smartWizard("theme", "arrows");
+
+        });
+    </script>
+
+<script type="text/javascript">
+
+    google.charts.load('current', {'packages':['line']});
+    //google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Data');
+      data.addColumn('number', 'Real');
+      data.addColumn('number', 'Previsão GM');
+      data.addColumn('number', 'Previsão BI');
+
+      data.addRows([
+
+       /*[# th:each="row : ${chartDataPrediction}"]*/
+                [[${row}]],
+                /*[/]*/
+      ]);
+
+      var options = {
+        chart: {
+          title: 'Box Office Earnings in First Two Weeks of Opening',
+          subtitle: 'in millions of dollars (USD)'
+        },
+        width: 900,
+        height: 500
+      };
+
+      var chart = new google.charts.Line(document.getElementById('linechart_material'));
+
+      chart.draw(data, google.charts.Line.convertOptions(options));
+
+<!--        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));-->
+
+<!--        chart.draw(data, options);-->
+    }
+
+
+
+    </script>
+</body>
+</html>
+
