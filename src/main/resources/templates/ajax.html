@@ -75,6 +75,18 @@
                 <div id="step-3" class="">
                     <h2>Executar Previsões do GM</h2>
                     <div>Executar Previsões do GM</div>
+
+
+                    <form method="POST" enctype="multipart/form-data" id="submitPrevisaoGM">
+                        <input type="submit" value="Gerar" id="btnSubmitPrevisaoGM" class="btn btn-primary"/>
+                    </form>
+                    <br/>
+                    <pre>
+                        <span id="resultPrevisaoGM"></span>
+                    </pre>
+
+
+
                 </div>
                 <div id="step-4" class="">
                     <h2>Resultado</h2>
@@ -95,6 +107,12 @@
                     <br/>
                     <div id="linechart_material_pe" style="width: 900px; height: 500px"></div>
                     <br/>
+
+                    <span id="gmMapeResult"></span>
+                    <br/>
+                    <span id="biMapeResult"></span>
+                    <br/>
+
                 </div>
             </div>
         </div>

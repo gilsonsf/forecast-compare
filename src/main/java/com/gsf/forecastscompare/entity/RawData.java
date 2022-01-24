@@ -16,6 +16,7 @@ public class RawData {
     private long id;
     private Date date;
     private Double value;
+    private Double forecastValue;
 
 
 }

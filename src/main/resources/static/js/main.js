@@ -79,6 +79,19 @@ $(document).ready(function () {
 
 });
 
+$(document).ready(function () {
+
+    $("#btnSubmitPrevisaoGM").click(function (event) {
+
+        //stop submit the form, we will post it manually.
+        event.preventDefault();
+
+        submitPrevisaoGM();
+
+    });
+
+});
+
 
 function fire_ajax_submit_upload() {
 
@@ -149,6 +162,38 @@ function fire_ajax_submit_uploadBI() {
 }
 
 
+function submitPrevisaoGM() {
+
+
+    $("#btnSubmitPrevisaoGM").prop("disabled", true);
+
+     var search = {}
+    search["username"] = $("#username").val();
+    //search["email"] = $("#email").val();
+
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: "/api/previsaoGM",
+        data: JSON.stringify(search),
+        dataType: 'json',
+        cache: false,
+        timeout: 600000,
+        success: function (data) {
+            $("#resultPrevisaoGM").text(data.msg);
+            console.log("SUCCESS : ", data.msg);
+            $("#btnSubmitPrevisaoGM").prop("disabled", false);
+        },
+        error: function (e) {
+            $("#btnSubmitPrevisaoGM").text(e.responseText);
+            console.log("ERROR : ", e);
+            $("#btnSubmitPrevisaoGM").prop("disabled", false);
+        }
+    });
+}
+
+
+
 $(document).ready(function () {
 
     $("#chart-form").submit(function (event) {
@@ -180,6 +225,7 @@ function fire_ajax_submit_chart() {
         success: function (data) {
             drawChart(data.chartDataPrediction);
             drawChartPE(data.chartDataPE);
+            drawMape(data);
             $("#btn-chart").prop("disabled", false);
         },
         error: function (e) {
@@ -244,6 +290,11 @@ function drawChartPE(values) {
       var chart = new google.charts.Line(document.getElementById('linechart_material_pe'));
 
       chart.draw(data, google.charts.Line.convertOptions(options));
+}
+
+function drawMape(data) {
+    $("#gmMapeResult").text(data.gmMapeResult);
+    $("#biMapeResult").text(data.biMapeResult);
 }
 
 
