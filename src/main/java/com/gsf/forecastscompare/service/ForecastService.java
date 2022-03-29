@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.stream.DoubleStream;
-import java.util.stream.Stream;
 
 @Service
 public class ForecastService {
@@ -111,13 +109,19 @@ public class ForecastService {
             i++;
         }
 
-        executePrevisaoGM(data);
+        double[] previsoes = executePrevisaoGM(data);
 
+
+        i=0;
+        for (RawData r : result) {
+            result.get(i).setForecastValue(previsoes[i]);
+            i++;
+        }
 
         return result;
     }
 
-    private void executePrevisaoGM(double[] data) {
+    private double[] executePrevisaoGM(double[] data) {
         double[][] h1 = new double[][]{data};
         double a, b;
 
@@ -192,6 +196,21 @@ public class ForecastService {
         for (double value : G_TESTE) {
             System.out.println(value);
         }
+
+        //teste 92 itens
+        double[] G_92 = new double[n];
+        G_92[0] = A_data[0];
+
+        for (int i = 1; i < n; i++) {
+            double value = F[i] - F[i - 1];
+            G_92[i] = formatCasasDecimais(value);
+        }
+
+        for (double value : G_92) {
+            System.out.println(value);
+        }
+
+        return G_92;
     }
 
     public static double[] cumsum(double[] numbers) {
@@ -253,30 +272,30 @@ public class ForecastService {
         List<DataResult> result = new ArrayList<>();
 
         listBI.forEach(
-                value -> {
+                biData -> {
                     DataResult dataResult = new DataResult();
 
-                    dataResult.setDateFormatted(DateFormatter.dateFormatted(value.getDate()));
-                    dataResult.setBiValue(value.getForecastValue());
+                    dataResult.setDateFormatted(DateFormatter.dateFormatted(biData.getDate()));
+                    dataResult.setBiValue(biData.getForecastValue());
 
-                    RawData gmData = getRawValueFromDate(listGM, value.getDate());
+                    RawData gmData = getRawValueFromDate(listGM, biData.getDate());
                     dataResult.setGmValue(gmData.getForecastValue());
 
-                    RawData rawData = getRawValueFromDate(listRawData, value.getDate());
+                    RawData rawData = getRawValueFromDate(listRawData, biData.getDate());
 
                     dataResult.setRawValue(rawData.getValue());
 
-                    Double peBI = (value.getForecastValue() - rawData.getValue()) / value.getForecastValue();
+                    Double peBI = (biData.getForecastValue() - rawData.getValue()) / biData.getForecastValue();
                     dataResult.setBiValuePE(peBI);
 
-                    Double mapeBI = Math.abs((rawData.getValue() - value.getForecastValue()) / rawData.getValue());
+                    Double mapeBI = Math.abs((rawData.getValue() - biData.getForecastValue()) / rawData.getValue());
                     dataResult.setBiValueMape(mapeBI);
 
 
-                    Double peGM = ((value.getForecastValue() - rawData.getValue()) / value.getForecastValue()) + 6;
+                    Double peGM = ((gmData.getForecastValue() - rawData.getValue()) / gmData.getForecastValue());
                     dataResult.setGmValuePE(peGM);
 
-                    Double mapeGE = Math.abs((rawData.getValue() - value.getForecastValue()) / rawData.getValue() + 6);
+                    Double mapeGE = Math.abs((rawData.getValue() - gmData.getForecastValue()) / rawData.getValue());
                     dataResult.setGmValueMape(mapeGE);
 
                     result.add(dataResult);
